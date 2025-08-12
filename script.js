@@ -7,19 +7,21 @@ const gameboard = (function () {
   ];
 
   function checkProgress() {
-    // The array is from 0 to 2, and then within that again from 0 to 2
-    // Players win if: Their symbol is in all 0, 1, or 2 fields of the 0, 1, 2 outter arrays, or
-    // in all fields of the outter arrays or in 0 0, 11, 22, or 02, 11, 20
-    // [0][0], [1][0], [2][0] / [0][1], [1][1], [2][1] / [0][2], [1][2], [2][2]
+    // Check for winning condition
+    // if [0][0] is equal to [1][1] and [2][2] or [0][2] is equal to [1][1] and [2][0]
+    if ((boardArray[0][0] === boardArray[1][1] && boardArray[1][1] === boardArray[2][2]) || (boardArray[0][2] === boardArray[1][1] && boardArray[1][1] === boardArray[2][0])) {
 
-    // [0][0], [0][1], [0][2] / [1][0], [1][1], [1][2] / [2][0], [2][1], [2][2]
+    } else {
 
-    // [0][0], [1][1], [2][2] / [0][2], [1][1], [2][0]
-    for (let i = 0; i < 3; i++) {
-      // if [0][i] and [1][i] and [2][i] 
-      // if [i][0] and [i][1] and [i][2]
     }
-    // if [0][0] and [1][1] and [2][2] or  [0][2] and [1][1] and [2][0]
+    for (let i = 0; i < 3; i++) {
+      // if [0][i] is equal to [1][i] and [2][i] or if [i][0] is equal to [i][1] and [i][2]
+      if ((boardArray[0][i] === boardArray[1][i] && boardArray[1][i] === boardArray[2][i]) || (boardArray[i][0] === boardArray[i][1] && boardArray[i][1] === boardArray[i][2])) {
+
+      } 
+    }
+
+
   };
 
   const playCell = function(x, y, player) {
