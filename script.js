@@ -12,9 +12,13 @@ const gameFlow = (function () {
 
   const executeTurn = function() {
     const player = players.getPlayer(currentPlayer);
-    const x = prompt(`${player.name}: x coordinate`);
-    const y = prompt(`${player.name}: y coordinate`);
-    const result = gameboard.playCell(x, y, player);
+    result = null;
+    do {
+      const x = prompt(`${player.name}: x coordinate`);
+      const y = prompt(`${player.name}: y coordinate`);
+      result = gameboard.playCell(x, y, player);
+    } while (result === "invalid");
+
     currentPlayer = currentPlayer === 0 ? 1 : 0;
     return result
   }
@@ -144,11 +148,14 @@ const gameboard = (function () {
   }
 
   const playCell = function(x, y, player) {
-    boardArray[x][y] = player.playerSymbol;
-    console.log(boardArray)
-    return checkProgress(x, y);
+    if (boardArray[x][y] !== null) {
+      return "invalid";
+    } else {
+      boardArray[x][y] = player.playerSymbol;
+      console.log(boardArray)
+      return checkProgress(x, y);
+    }
   }
-
   return { playCell, resetBoard };
 })();
 
