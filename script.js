@@ -2,34 +2,60 @@
 // Gameboard array should be a variable within a module, so we can not directly influence it but with the functions
 
 const gameFlow = (function () {
+  // Have a variable to see who's turn it is
   let currentPlayer;
 
+  // Decide who goes first
   const whoGoesFirst = function (id) {
     currentPlayer = id;
   }
+
+  function executeTurn() {
+    const x = prompt("x coordinate");
+    const y = prompt("y coordinate");
+    const player = players.getPlayer(currentPlayer);
+    gameboard.playCell(x, y, player);
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+  }
+
+  // Start the game
   const startGame = function() {
     if (players.playersReady) {
+      whoGoesFirst(1);
       gameboard.resetBoard();
+    };
+  }
+
+  function playGame() {
+    startGame();
+    while (gameboard.checkProgress === null) {
+      executeTurn();
     }
   }
-});
+
+  return { playGame };
+})();
 
 const players = (function () {
   const playersArray = [];
 
+  // Add a player to the array, if its the first they have o, if second x
   const addPlayer = function(name) {
     const playerSymbol = playersArray.length === 0 ? "o" : "x";
     return { name, playerSymbol };
   }
   
-  const getPlayer = function(id) {
-    return playersArray[id];
+  // Get the player by the index in the array
+  const getPlayer = function(index) {
+    return playersArray[index];
   }
 
+  // Reset players for a new game
   const resetPlayers = function() {
     playersArray.splice(0, playersArray.length);
   }
 
+  // Check if players are ready (may not be needed)
   const playersReady = function() {
     return playersArray.length === 2;
   }
@@ -101,7 +127,7 @@ const gameboard = (function () {
   }
 
   const playCell = function(x, y, player) {
-    boardArray[x][y] = player.symbol;
+    boardArray[x][y] = player.playerSymbol;
     console.log(boardArray)
     checkProgress(x, y);
   }
