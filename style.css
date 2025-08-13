@@ -1,4 +1,20 @@
-/* Color consideration: 0 = #59114D x = #E98A15 BG = #ECE5F0, grid lines = #003B36, other = #012622 */
+@font-face {
+    font-family: 'title';
+    src: url('fonts/3dumb.woff2') format('woff2'),
+        url('fonts/3dumb.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'symbol';
+    src: url('fonts/2Dumb.woff2') format('woff2'),
+        url('fonts/2Dumb.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
 
 :root {
   font-size: 16px;
@@ -28,4 +44,27 @@ input {
   display: grid;
   grid-template-columns: 1fr 4fr 1fr;
   grid-template-rows: 1fr 5fr;
+  grid-template-areas: 
+    'top-bar top-bar top-bar'
+    'player0 gameboard player1';
+}
+
+#top-bar {
+  background-color: var(--main-color);
+  grid-area: top-bar;
+}
+
+#player0 {
+  background-color: var(--round-symbol);
+  grid-area: player0;
+}
+
+#player1 {
+  background-color: var(--cross-symbol);
+  grid-area: player1;
+}
+
+#gameboard {
+  background-color: var(--background-color);
+  grid-area: gameboard;
 }
