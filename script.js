@@ -6,31 +6,39 @@ const gameFlow = (function () {
   let currentPlayer;
 
   // Decide who goes first
-  const whoGoesFirst = function (id) {
+  function whoGoesFirst(id) {
     currentPlayer = id;
   }
 
-  function executeTurn() {
+  const executeTurn = function() {
     const x = prompt("x coordinate");
     const y = prompt("y coordinate");
     const player = players.getPlayer(currentPlayer);
-    gameboard.playCell(x, y, player);
+    const result = gameboard.playCell(x, y, player);
     currentPlayer = currentPlayer === 1 ? 2 : 1;
+    return result
   }
 
   // Start the game
-  const startGame = function() {
+  function startGame() {
+    console.log("Checking that players are ready")
     if (players.playersReady) {
+      console.log("Player 1 goes first.")
       whoGoesFirst(1);
+      console.log("Reset the board.")
       gameboard.resetBoard();
     };
   }
 
   function playGame() {
+    console.log("Playing the game.")
     startGame();
-    while (gameboard.checkProgress === null) {
-      executeTurn();
-    }
+    console.log("The game has started")
+    result = null;
+    do {
+      result = executeTurn(); 
+    } while(result === null);
+    return "THE GAME IS OVER"
   }
 
   return { playGame };
@@ -60,7 +68,7 @@ const players = (function () {
     return playersArray.length === 2;
   }
 
-  return { addPlayer, resetPlayers, playersReady };
+  return { addPlayer, resetPlayers, playersReady, getPlayer };
 })();
 
 const gameboard = (function () {
@@ -74,7 +82,7 @@ const gameboard = (function () {
   let boardArray = [
     [null, null, null], [null, null, null], [null, null, null],
   ];
-
+  let turns = 0;
   // This function checks if someone has won the game after this turn
   function checkProgress(x, y) {
     // This function checks 3 coordinates (that form a line on the gameboard)
@@ -86,37 +94,43 @@ const gameboard = (function () {
         return null;
       }
     }
-
     // Winning Condition: if [0][0] is equal to [1][1] and [2][2] or [0][2] is equal to [1][1] and [2][0]
     // or if [0][i] is equal to [1][i] and [2][i] or if [i][0] is equal to [i][1] and [i][2]
 
-    // Prepare an array of coordinates that form the lines we need to check for the winning condition
-    // First, only add lines in the x or y position that is relevant
-    const lines = [[x, 0, x, 1, x, 2], [0, y, 1, y, 2, y]];
-    // If the player played the central field, add both diagonals
-    if (x === 1 && y === 1) {
-      lines.push([0, 0, 1, 1, 2, 2]);
-      lines.push([2, 0, 1, 1, 0, 2]);
-    // If the player played the top left or bottom right corner, add that diagonal only
-    } else if ((x === 0 || x === 2) && x === y ) {
-      lines.push([0, 0, 1, 1, 2, 2]);
-    // If the player played the top right or bottom left corner, add that diagonal only
-    } else if ((x === 0 && y === 2) || (x === 2 && y === 0)) {
-      lines.push([0, 2, 1, 1, 2, 0]);
-    }
-
     let result = null;
-    // Check all possible combination of lines to see if we have a winner (Could probably be reduced to only checking cells relevant to the one played)
-    for (const line of lines) {
-      const cell1 = boardArray[line[0]][line[1]];
-      const cell2 = boardArray[line[2]][line[3]];
-      const cell3 = boardArray[line[4]][line[5]];
-      result = checkLine(cell1, cell2, cell3);
-      if (result !== null) {
-        console.log("WE HAVE A WINNER!")
-        return result;
-      } 
-    }
+
+    turns++;
+    // A player can only win from turn 5 and onwards, so avoid checking before
+    if (turns >= 5) {
+      // Prepare an array of coordinates that form the lines we need to check for the winning condition
+      // First, only add lines in the x or y position that is relevant
+      const lines = [[x, 0, x, 1, x, 2], [0, y, 1, y, 2, y]];
+      // If the player played the central field, add both diagonals
+      if (x === 1 && y === 1) {
+        lines.push([0, 0, 1, 1, 2, 2]);
+        lines.push([2, 0, 1, 1, 0, 2]);
+      // If the player played the top left or bottom right corner, add that diagonal only
+      } else if ((x === 0 || x === 2) && x === y ) {
+        lines.push([0, 0, 1, 1, 2, 2]);
+      // If the player played the top right or bottom left corner, add that diagonal only
+      } else if ((x === 0 && y === 2) || (x === 2 && y === 0)) {
+        lines.push([0, 2, 1, 1, 2, 0]);
+      }
+
+      // Check all possible combination of lines to see if we have a winner (Could probably be reduced to only checking cells relevant to the one played)
+      for (const line of lines) {
+        const cell1 = boardArray[line[0]][line[1]];
+        const cell2 = boardArray[line[2]][line[3]];
+        const cell3 = boardArray[line[4]][line[5]];
+        result = checkLine(cell1, cell2, cell3);
+        if (result !== null) {
+          return result;
+        } 
+      }
+      if (turns === 9) {
+        return "draw";
+      }
+    } 
     return result;
   };
 
@@ -124,12 +138,13 @@ const gameboard = (function () {
     boardArray = [
       [null, null, null], [null, null, null], [null, null, null],
     ];
+    turns = 0;
   }
 
   const playCell = function(x, y, player) {
     boardArray[x][y] = player.playerSymbol;
     console.log(boardArray)
-    checkProgress(x, y);
+    return checkProgress(x, y);
   }
 
   return { playCell, resetBoard };
