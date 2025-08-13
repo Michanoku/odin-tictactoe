@@ -1,1 +1,11 @@
 /* Color consideration: 0 = #59114D x = #E98A15 BG = #ECE5F0, grid lines = #003B36, other = #012622 */
+
+:root {
+  font-size: 16px;
+  --main-color: #012622;
+  --grid-lines: #003B36;
+  --background-color: #ECE5F0;
+  --round-symbol: #59114D;
+  --cross-symbol: #E98A15;
+  font-family: Arial, Helvetica, sans-serif;
+}
