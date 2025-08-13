@@ -1,6 +1,12 @@
 // Array of a gameboard in a Gameboard object.
 // Gameboard array should be a variable within a module, so we can not directly influence it but with the functions
 
+const players = (function () {
+  function addPlayer(name) {
+
+  }
+});
+
 const gameboard = (function () {
   // Gameboard coordinates: 
   //  [0][0] | [0][1] | [0][2]
@@ -43,7 +49,7 @@ const gameboard = (function () {
       lines.push([0, 2, 1, 1, 2, 0]);
     }
 
-    let result;
+    let result = null;
     // Check all possible combination of lines to see if we have a winner (Could probably be reduced to only checking cells relevant to the one played)
     for (const line of lines) {
       const cell1 = boardArray[line[0]][line[1]];
@@ -53,12 +59,13 @@ const gameboard = (function () {
       if (result !== null) {
         console.log("WE HAVE A WINNER!")
         return result;
-      }
+      } 
     }
+    return result;
   };
 
   const playCell = function(x, y, player) {
-    boardArray[x][y] = player;
+    boardArray[x][y] = player.symbol;
     console.log(boardArray)
     checkProgress(x, y);
   }
