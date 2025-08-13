@@ -88,19 +88,19 @@ input {
 }
 
 #player0 {
-  background-color: var(--round-symbol);
+  color: var(--round-symbol);
   grid-area: player0;
 }
 
 #player1 {
-  background-color: var(--cross-symbol);
+  color: var(--cross-symbol);
   grid-area: player1;
 }
 
 #player0, #player1 {
+  font-weight: 700;
   font-size: 2rem;
   text-align: center;
-  color: var(--background-color);
   align-content: center;
 }
 
@@ -112,7 +112,6 @@ input {
 } 
 
 #gameboard {
-  background-color: var(--background-color);
   grid-area: gameboard;
   padding: 2rem;
   display: grid;
