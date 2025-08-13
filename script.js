@@ -11,11 +11,11 @@ const gameFlow = (function () {
   }
 
   const executeTurn = function() {
-    const x = prompt("x coordinate");
-    const y = prompt("y coordinate");
     const player = players.getPlayer(currentPlayer);
+    const x = prompt(`${player.name}: x coordinate`);
+    const y = prompt(`${player.name}: y coordinate`);
     const result = gameboard.playCell(x, y, player);
-    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    currentPlayer = currentPlayer === 0 ? 1 : 0;
     return result
   }
 
@@ -23,8 +23,8 @@ const gameFlow = (function () {
   function startGame() {
     console.log("Checking that players are ready")
     if (players.playersReady) {
-      console.log("Player 1 goes first.")
-      whoGoesFirst(1);
+      console.log("Player 0 goes first.")
+      whoGoesFirst(0);
       console.log("Reset the board.")
       gameboard.resetBoard();
     };
@@ -38,7 +38,8 @@ const gameFlow = (function () {
     do {
       result = executeTurn(); 
     } while(result === null);
-    return "THE GAME IS OVER"
+    console.log("THE GAME IS OVER")
+    console.log(result)
   }
 
   return { playGame };
@@ -48,18 +49,19 @@ const players = (function () {
   const playersArray = [];
 
   // Add a player to the array, if its the first they have o, if second x
-  const addPlayer = function(name) {
+  function addPlayer(name) {
     const playerSymbol = playersArray.length === 0 ? "o" : "x";
-    return { name, playerSymbol };
+    playersArray.push({ name, playerSymbol });
   }
   
   // Get the player by the index in the array
   const getPlayer = function(index) {
+    console.log(playersArray[index]);
     return playersArray[index];
   }
 
   // Reset players for a new game
-  const resetPlayers = function() {
+  function resetPlayers() {
     playersArray.splice(0, playersArray.length);
   }
 
