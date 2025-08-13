@@ -2,67 +2,82 @@
 // Gameboard array should be a variable within a module, so we can not directly influence it but with the functions
 
 const UI = (function () {
+  // Add EventListeners to the player name forms
   const forms = document.querySelectorAll('form');
+  const gridCells = document.querySelectorAll('.grid-cell');
+  const help = document.querySelector('#help');
   forms.forEach(form => {
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       const playerForm = new FormData(form);
       const playerName = playerForm.get("name");
       if (playerName !== "") {
-        players.addPlayer(playerName);
         document.querySelector(`#name-player-${form.dataset.player}`).textContent = playerName;
         form.style.display = "none";
+        document.querySelector(`#score-display-player-${form.dataset.player}`).style.display = "block";
+        players.addPlayer(playerName);
+        if (players.playersReady()) {
+          gameFlow.setGame();
+        }
       };
     });
   });
+  gridCells.forEach(cell => {
+    cell.addEventListener('click', () => {
+      if (gameFlow.showProgress() && cell.dataset.symbol === "") {
+        let symbol = gameFlow.getCurrentPlayer().playerSymbol;
+        cell.dataset.symbol = symbol;
+        cell.textContent = symbol.toUpperCase();
+        gameFlow.executeTurn(cell.dataset.x, cell.dataset.y);
+        help.textContent = `${gameFlow.getCurrentPlayer().name}'s turn`;
+      };
+    });
+  });
+
+  function updateHelp(message) {
+    help.textContent = message;
+  }
+  return { updateHelp };
 })();
 
 const gameFlow = (function () {
   // Have a variable to see who's turn it is
   let currentPlayer;
-
+  let gameStart = false;
   // Decide who goes first
   function whoGoesFirst(id) {
     currentPlayer = id;
   }
 
-  const executeTurn = function() {
+  const executeTurn = function(x, y) {
     const player = players.getPlayer(currentPlayer);
     result = null;
-    do {
-      const x = prompt(`${player.name}: x coordinate`);
-      const y = prompt(`${player.name}: y coordinate`);
-      result = gameboard.playCell(x, y, player);
-    } while (result === "invalid");
-
+    result = gameboard.playCell(x, y, player);
     currentPlayer = currentPlayer === 0 ? 1 : 0;
     return result
   }
 
-  // Start the game
-  function startGame() {
+  const showProgress = function () {
+    return gameStart;
+  };
+
+  // Set the initial game state
+  function setGame() {
     console.log("Checking that players are ready")
-    if (players.playersReady) {
-      console.log("Player 0 goes first.")
-      whoGoesFirst(0);
-      console.log("Reset the board.")
-      gameboard.resetBoard();
-    };
+    console.log("Player 0 goes first.")
+    whoGoesFirst(0);
+    console.log("Reset the board.")
+    gameboard.resetBoard();
+    gameStart = true;
+    UI.updateHelp(`${getCurrentPlayer().name}'s turn`);
   }
 
-  function playGame() {
-    console.log("Playing the game.")
-    startGame();
-    console.log("The game has started")
-    result = null;
-    do {
-      result = executeTurn(); 
-    } while(result === null);
-    console.log("THE GAME IS OVER")
-    console.log(result)
+
+  function getCurrentPlayer() {
+    return players.getPlayer(currentPlayer);
   }
 
-  return { playGame };
+  return { setGame, showProgress, executeTurn, getCurrentPlayer };
 })();
 
 const players = (function () {
@@ -71,7 +86,7 @@ const players = (function () {
   // Add a player to the array, if its the first they have o, if second x
   function addPlayer(name) {
     const playerSymbol = playersArray.length === 0 ? "o" : "x";
-    playersArray.push({ name, playerSymbol });
+    playersArray.push({ name, playerSymbol, score: 0 });
   }
   
   // Get the player by the index in the array

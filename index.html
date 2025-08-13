@@ -14,6 +14,7 @@
     </div>
     <div id="player0">
       <div id="name-player-0">Player 1</div>
+      <div id="score-display-player-0">Score: <span id="score-player-0">0</span></div>
       <form class="name-input" data-player="0">  
         <input type="text" name="name" minlength="1" maxlength="10" required>
         <button type="submit">Accept</button>
@@ -21,21 +22,22 @@
     </div>
     <div id="player1">
       <div id="name-player-1">Player 2</div>
+      <div id="score-display-player-1">Score: <span id="score-player-1">0</span></div>
       <form class="name-input" data-player="1">   
         <input type="text" name="name" minlength="1" maxlength="10" required>
         <button type="submit">Accept</button>
       </form>
     </div>
     <div id="gameboard">
-      <div class="grid-cell border-right border-bottom" data-x="0" data-y="0" data-symbol="o">O</div>
-      <div class="grid-cell border-right border-left border-bottom" data-x="0" data-y="1" data-symbol="x">X</div>
-      <div class="grid-cell border-left border-bottom" data-x="0" data-y="2" data-symbol="x">X</div>
-      <div class="grid-cell border-right border-bottom border-top" data-x="1" data-y="0" data-symbol="o">O</div>
-      <div class="grid-cell border-right border-left border-bottom border-top" data-x="1" data-y="1" data-symbol="o">O</div>
-      <div class="grid-cell border-left border-bottom border-top" data-x="1" data-y="2" data-symbol="x">X</div>
-      <div class="grid-cell border-right border-top" data-x="2" data-y="0" data-symbol="x">X</div>
-      <div class="grid-cell border-right border-left border-top" data-x="2" data-y="1" data-symbol="x">X</div>
-      <div class="grid-cell border-left border-top" data-x="2" data-y="2" data-symbol="o">O</div>
+      <div class="grid-cell border-right border-bottom" data-x="0" data-y="0" data-symbol=""></div>
+      <div class="grid-cell border-right border-left border-bottom" data-x="0" data-y="1" data-symbol=""></div>
+      <div class="grid-cell border-left border-bottom" data-x="0" data-y="2" data-symbol=""></div>
+      <div class="grid-cell border-right border-bottom border-top" data-x="1" data-y="0" data-symbol=""></div>
+      <div class="grid-cell border-right border-left border-bottom border-top" data-x="1" data-y="1" data-symbol=""></div>
+      <div class="grid-cell border-left border-bottom border-top" data-x="1" data-y="2" data-symbol=""></div>
+      <div class="grid-cell border-right border-top" data-x="2" data-y="0" data-symbol=""></div>
+      <div class="grid-cell border-right border-left border-top" data-x="2" data-y="1" data-symbol=""></div>
+      <div class="grid-cell border-left border-top" data-x="2" data-y="2" data-symbol=""></div>
     </div>
   </div>
   <script src="script.js"></script>

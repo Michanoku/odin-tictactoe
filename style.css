@@ -85,11 +85,15 @@ button {
   margin-top: 1rem;
 }
 
-#name-player-0, #name-player-1 {
+#name-player-0, #name-player-1, #score-display-player-0, #score-display-player-1 {
   margin: 2rem 0rem;
   font-size: 2rem;
   text-align: center;
   color: var(--background-color);
+}
+
+#score-display-player-0, #score-display-player-1 {
+  display: none;
 }
 
 input[type="text"] {
@@ -124,6 +128,7 @@ input[type="text"]:focus {
   justify-content: center;
   align-items: center;
   font-size: 8rem;
+  cursor: pointer;
 }
 
 [data-symbol="x"] {
