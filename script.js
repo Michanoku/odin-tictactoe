@@ -4,6 +4,11 @@ const userInterface = (function () {
   const form = document.querySelector('form');
   const gridCells = document.querySelectorAll('.grid-cell');
   const help = document.querySelector('#help');
+  const firstButtons = document.querySelector('#first-buttons');
+  const player0Button = document.querySelector('#button-player-0');
+  const player1Button = document.querySelector('#button-player-1');
+  const againButtons = document.querySelector('#again-buttons');
+  const again = document.querySelectorAll('button[name="again"]');
 
   // Event Listeners
   form.addEventListener('submit', (event) => {
@@ -17,9 +22,19 @@ const userInterface = (function () {
       document.querySelector('#name-player-0').textContent = playerName0;
       document.querySelector('#name-player-1').textContent = playerName1;
       form.style.display = "none";
-      // Tell gameflow that a new player was added
-      gameFlow.registerAndStart(playerName0, playerName1);
+      updateHelp('Who goes first?');
+      player0Button.textContent = playerName0;
+      player1Button.textContent = playerName1;
+      firstButtons.style.display = "flex";
+      // Tell gameflow that the players were added
+      gameFlow.register(playerName0, playerName1);
     };
+  });
+  [player0Button, player1Button].forEach(button => {
+    button.addEventListener('click', () => {
+      firstButtons.style.display = "none";
+      gameFlow.setGame(button.dataset.player);
+    });  
   });
   gridCells.forEach(cell => {
     cell.addEventListener('click', () => {
@@ -29,12 +44,21 @@ const userInterface = (function () {
         let symbol = gameFlow.getCurrentPlayer().playerSymbol;
         cell.dataset.symbol = symbol;
         cell.textContent = symbol.toUpperCase();
-
         // Tell gameflow that the cell was played
         gameFlow.executeTurn(cell.dataset.x, cell.dataset.y);
       };
     });
   });
+  again.forEach(button => {
+    button.addEventListener('click', () => {
+      gameFlow.reset(button.dataset.again);
+    });
+  });
+
+  function endGame(newScore) {
+    againButtons.style.display = "flex";
+    updateHelp("Play again?");
+  }
 
   // Update the help text in the UI
   function updateHelp(message) {
@@ -46,36 +70,36 @@ const userInterface = (function () {
     gridCells.forEach(cell => {
       cell.removeAttribute("data-symbol");
       cell.textContent = "";
+      againButtons.style.display = "none";
     });
   }
-  return { updateHelp, resetBoard };
+  return { updateHelp, endGame, resetBoard };
 })();
 
 const gameFlow = (function () {
   // Have a variable to see who's turn it is
   let currentPlayer;
   let gameStart = false;
-  // Decide who goes first
-  function whoGoesFirst(id) {
-    currentPlayer = id;
-  }
 
   // Handle the game end
   function endGame(result) {
     gameStart = false;
+    const player = getCurrentPlayer();
     if (result === "draw") {
       userInterface.updateHelp('Draw!');
     } else {
       userInterface.updateHelp(`${result} wins!`);
+      player.addPoint();
     }
+    userInterface.endGame(currentPlayer, player.score);
   }
 
   // Get the players names and hand them to the players IIFE, start the game if there are 2 players
-  function registerAndStart(playerName0, playerName1) {
+  function register(playerName0, playerName1) {
     players.addPlayer(playerName0);
     players.addPlayer(playerName1);
-    setGame();
   }
+
 
   // Execute a single turn
   const executeTurn = function(x, y) {
@@ -100,8 +124,8 @@ const gameFlow = (function () {
   };
 
   // Set the initial game state
-  function setGame() {
-    whoGoesFirst(0);
+  function setGame(startingPlayer) {
+    currentPlayer = parseInt(startingPlayer);
     gameStart = true;
     userInterface.updateHelp(`${getCurrentPlayer().name}'s turn`);
   }
@@ -110,16 +134,37 @@ const gameFlow = (function () {
     return players.getPlayer(currentPlayer);
   }
 
-  return { setGame, showProgress, executeTurn, getCurrentPlayer, registerAndStart };
+  function reset(option) {
+    userInterface.resetBoard();
+    gameboard.resetBoard();
+    if (option === "yes") {
+      currentPlayer = currentPlayer === 0 ? 1 : 0;
+      setGame(currentPlayer);
+    } else {
+      players.resetPlayers;
+    }
+  }
+
+  return { setGame, showProgress, executeTurn, getCurrentPlayer, register, reset };
 })();
 
 const players = (function () {
   const playersArray = [];
 
+  function Player(name, symbol) {
+    this.name = name;
+    this.playerSymbol = symbol;
+    this.score = 0;
+  }
+  Player.prototype.addScore = function() {
+    this.score++;
+  };
+
   // Add a player to the array, if its the first they have o, if second x
   function addPlayer(name) {
     const playerSymbol = playersArray.length === 0 ? "o" : "x";
-    playersArray.push({ name, playerSymbol, score: 0 });
+    const player = new Player(name, playerSymbol);
+    playersArray.push(player);
   }
   
   // Get the player by the index in the array

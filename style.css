@@ -90,11 +90,21 @@ button {
   cursor: pointer;
   font-size: 1.2rem;
   padding: 0.6rem 2rem;
-  margin-top: 1rem;
+  margin: 1rem;
 }
 
 button:active {
   background-color: var(--background-color-muted);
+}
+
+#first-buttons {
+  display: none;
+  justify-content: center;
+}
+
+#again-buttons {
+  display: none;
+  justify-content: center;
 }
 
 #name-player-0, #name-player-1, 
@@ -154,7 +164,7 @@ input[type="text"]:focus {
 
 #title {
   flex: 1;
-  text-align: start;
+  text-align: center;
   font-family: "title", Arial, Helvetica, sans-serif;
   color: var(--background-color);
   font-size: 5.5rem;
