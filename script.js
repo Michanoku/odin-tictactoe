@@ -14,7 +14,7 @@ const gameboard = (function () {
   ];
 
   // This function checks if someone has won the game after this turn
-  function checkProgress() {
+  function checkProgress(x, y) {
     // This function checks 3 coordinates (that form a line on the gameboard)
     function checkLine(coordA, coordB, coordC) {
       // If the first coordinate is not null, and the three coordinates are otherwise the same, return the value (the players symbol)
@@ -29,14 +29,22 @@ const gameboard = (function () {
     // or if [0][i] is equal to [1][i] and [2][i] or if [i][0] is equal to [i][1] and [i][2]
 
     // Prepare an array of coordinates that form the lines we need to check for the winning condition
-    const lines = [[0, 0, 1, 1, 2, 2], [0, 2, 1, 1, 2, 0]];
-    for (let i = 0; i < 3; i ++) {
-      lines.push([0, i, 1, i, 2, i]);
-      lines.push([i, 0, i, 1, i, 2]);
+    // First, only add lines in the x or y position that is relevant
+    const lines = [[x, 0, x, 1, x, 2], [0, y, 1, y, 2, y]];
+    // If the player played the central field, add both diagonals
+    if (x === 1 && y === 1) {
+      lines.push([0, 0, 1, 1, 2, 2]);
+      lines.push([2, 0, 1, 1, 0, 2]);
+    // If the player played the top left or bottom right corner, add that diagonal only
+    } else if ((x === 0 || x === 2) && x === y ) {
+      lines.push([0, 0, 1, 1, 2, 2]);
+    // If the player played the top right or bottom left corner, add that diagonal only
+    } else if ((x === 0 && y === 2) || (x === 2 && y === 0)) {
+      lines.push([0, 2, 1, 1, 2, 0]);
     }
 
     let result;
-    // Check all combination of lines to see if we have a winner (Could probably be reduced to only checking cells relevant to the one played)
+    // Check all possible combination of lines to see if we have a winner (Could probably be reduced to only checking cells relevant to the one played)
     for (const line of lines) {
       const cell1 = boardArray[line[0]][line[1]];
       const cell2 = boardArray[line[2]][line[3]];
@@ -52,7 +60,7 @@ const gameboard = (function () {
   const playCell = function(x, y, player) {
     boardArray[x][y] = player;
     console.log(boardArray)
-    checkProgress();
+    checkProgress(x, y);
   }
   return{ playCell };
 })();
