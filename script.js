@@ -1,41 +1,46 @@
-// Array of a gameboard in a Gameboard object.
-// Gameboard array should be a variable within a module, so we can not directly influence it but with the functions
-
-const UI = (function () {
-  // Add EventListeners to the player name forms
+// The IIFE to alter the userInterface
+const userInterface = (function () {
+  // Add userInterface Elements needed 
   const forms = document.querySelectorAll('form');
   const gridCells = document.querySelectorAll('.grid-cell');
   const help = document.querySelector('#help');
+
+  // Event Listeners
   forms.forEach(form => {
     form.addEventListener('submit', (event) => {
+      // Get the form data and the player name
       event.preventDefault();
       const playerForm = new FormData(form);
       const playerName = playerForm.get("name");
-      if (playerName !== "") {
+      if (playerName) {
+        // Update the player section with their name, hide the input and show the scoreboard
         document.querySelector(`#name-player-${form.dataset.player}`).textContent = playerName;
         form.style.display = "none";
         document.querySelector(`#score-display-player-${form.dataset.player}`).style.display = "block";
-        players.addPlayer(playerName);
-        if (players.playersReady()) {
-          gameFlow.setGame();
-        }
+        gameFlow.registerAndCheck(playerName);
       };
     });
   });
   gridCells.forEach(cell => {
     cell.addEventListener('click', () => {
-      if (gameFlow.showProgress() && cell.dataset.symbol === "") {
+      if (gameFlow.showProgress() && !cell.dataset.symbol) {
         let symbol = gameFlow.getCurrentPlayer().playerSymbol;
         cell.dataset.symbol = symbol;
         cell.textContent = symbol.toUpperCase();
         gameFlow.executeTurn(cell.dataset.x, cell.dataset.y);
-        help.textContent = `${gameFlow.getCurrentPlayer().name}'s turn`;
       };
     });
   });
 
   function updateHelp(message) {
     help.textContent = message;
+  }
+
+  function resetBoard() {
+    gridCells.forEach(cell => {
+      cell.removeAttribute("data-symbol");
+      cell.textContent = "";
+    });
   }
   return { updateHelp };
 })();
@@ -49,12 +54,33 @@ const gameFlow = (function () {
     currentPlayer = id;
   }
 
+  function endGame(result) {
+    gameStart = false;
+    if (result === "draw") {
+      userInterface.updateHelp('Draw!');
+    } else {
+      userInterface.updateHelp(`${result} wins!`);
+    }
+  }
+
+  function registerAndCheck() {
+    count = players.addPlayer(playerName);
+    if (count === 2) {
+      setGame();
+    }
+  }
+
   const executeTurn = function(x, y) {
     const player = players.getPlayer(currentPlayer);
     result = null;
     result = gameboard.playCell(x, y, player);
-    currentPlayer = currentPlayer === 0 ? 1 : 0;
-    return result
+    console.log(result)
+    if (result !== null) {  
+      endGame(result);
+    } else {
+      userInterface.updateHelp(`${gameFlow.getCurrentPlayer().name}'s turn`);
+      currentPlayer = currentPlayer === 0 ? 1 : 0;
+    }
   }
 
   const showProgress = function () {
@@ -69,7 +95,7 @@ const gameFlow = (function () {
     console.log("Reset the board.")
     gameboard.resetBoard();
     gameStart = true;
-    UI.updateHelp(`${getCurrentPlayer().name}'s turn`);
+    userInterface.updateHelp(`${getCurrentPlayer().name}'s turn`);
   }
 
 
@@ -77,7 +103,7 @@ const gameFlow = (function () {
     return players.getPlayer(currentPlayer);
   }
 
-  return { setGame, showProgress, executeTurn, getCurrentPlayer };
+  return { setGame, showProgress, executeTurn, getCurrentPlayer, registerAndCheck };
 })();
 
 const players = (function () {
@@ -87,22 +113,17 @@ const players = (function () {
   function addPlayer(name) {
     const playerSymbol = playersArray.length === 0 ? "o" : "x";
     playersArray.push({ name, playerSymbol, score: 0 });
+    return playersArray.length;
   }
   
   // Get the player by the index in the array
   const getPlayer = function(index) {
-    console.log(playersArray[index]);
     return playersArray[index];
   }
 
   // Reset players for a new game
   function resetPlayers() {
     playersArray.splice(0, playersArray.length);
-  }
-
-  // Check if players are ready (may not be needed)
-  const playersReady = function() {
-    return playersArray.length === 2;
   }
 
   return { addPlayer, resetPlayers, playersReady, getPlayer };
@@ -126,7 +147,7 @@ const gameboard = (function () {
     function checkLine(coordA, coordB, coordC) {
       // If the first coordinate is not null, and the three coordinates are otherwise the same, return the value (the players symbol)
       if (coordA !== null && (coordA === coordB && coordB === coordC)) {
-        return coordA;
+        return gameFlow.getCurrentPlayer().name;
       } else {
         return null;
       }
@@ -179,13 +200,10 @@ const gameboard = (function () {
   }
 
   const playCell = function(x, y, player) {
-    if (boardArray[x][y] !== null) {
-      return "invalid";
-    } else {
-      boardArray[x][y] = player.playerSymbol;
-      console.log(boardArray)
-      return checkProgress(x, y);
-    }
+    boardArray[x][y] = player.playerSymbol;
+    console.log(boardArray)
+    return checkProgress(x, y);
+
   }
   return { playCell, resetBoard };
 })();
