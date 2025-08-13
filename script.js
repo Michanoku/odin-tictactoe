@@ -1,27 +1,25 @@
 // The IIFE to alter the userInterface
 const userInterface = (function () {
   // Add userInterface Elements needed 
-  const forms = document.querySelectorAll('form');
+  const form = document.querySelector('form');
   const gridCells = document.querySelectorAll('.grid-cell');
   const help = document.querySelector('#help');
 
   // Event Listeners
-  forms.forEach(form => {
-    form.addEventListener('submit', (event) => {
-      // Get the form data and the player name
-      event.preventDefault();
-      const playerForm = new FormData(form);
-      const playerName = playerForm.get("name");
-      if (playerName) {
-        // Update the player section with their name, hide the input and show the scoreboard
-        document.querySelector(`#name-player-${form.dataset.player}`).textContent = playerName;
-        form.style.display = "none";
-        document.querySelector(`#score-display-player-${form.dataset.player}`).style.display = "block";
-
-        // Tell gameflow that a new player was added
-        gameFlow.registerAndCheck(playerName);
-      };
-    });
+  form.addEventListener('submit', (event) => {
+    // Get the form data and the player name
+    event.preventDefault();
+    const playerForm = new FormData(form);
+    const playerName0 = playerForm.get("name-player-0");
+    const playerName1 = playerForm.get("name-player-1");
+    if (playerName0 && playerName1) {
+      // Update the player section with their name, hide the input and show the scoreboard
+      document.querySelector('#name-player-0').textContent = playerName0;
+      document.querySelector('#name-player-1').textContent = playerName1;
+      form.style.display = "none";
+      // Tell gameflow that a new player was added
+      gameFlow.registerAndStart(playerName0, playerName1);
+    };
   });
   gridCells.forEach(cell => {
     cell.addEventListener('click', () => {
@@ -73,11 +71,10 @@ const gameFlow = (function () {
   }
 
   // Get the players names and hand them to the players IIFE, start the game if there are 2 players
-  function registerAndCheck() {
-    count = players.addPlayer(playerName);
-    if (count === 2) {
-      setGame();
-    }
+  function registerAndStart(playerName0, playerName1) {
+    players.addPlayer(playerName0);
+    players.addPlayer(playerName1);
+    setGame();
   }
 
   // Execute a single turn
@@ -86,13 +83,14 @@ const gameFlow = (function () {
     const player = players.getPlayer(currentPlayer);
     // Play the cell
     result = gameboard.playCell(x, y, player);
+    console.log(result)
     // If the result is not null, someone won or it's a draw
     if (result !== null) {  
       endGame(result);
     // Else, update the interface with who's turn it is and switch players
     } else {
-      userInterface.updateHelp(`${gameFlow.getCurrentPlayer().name}'s turn`);
       currentPlayer = currentPlayer === 0 ? 1 : 0;
+      userInterface.updateHelp(`${gameFlow.getCurrentPlayer().name}'s turn`);
     }
   }
 
@@ -112,7 +110,7 @@ const gameFlow = (function () {
     return players.getPlayer(currentPlayer);
   }
 
-  return { setGame, showProgress, executeTurn, getCurrentPlayer, registerAndCheck };
+  return { setGame, showProgress, executeTurn, getCurrentPlayer, registerAndStart };
 })();
 
 const players = (function () {
@@ -122,7 +120,6 @@ const players = (function () {
   function addPlayer(name) {
     const playerSymbol = playersArray.length === 0 ? "o" : "x";
     playersArray.push({ name, playerSymbol, score: 0 });
-    return playersArray.length;
   }
   
   // Get the player by the index in the array
