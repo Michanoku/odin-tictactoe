@@ -13,10 +13,19 @@
       <div id="help">Enter player names</div>
     </div>
     <div id="player0">
-      <div>Player 1</div>
-      <input type="text" id="name-player-1">
+      <div id="name-player-0">Player 1</div>
+      <form class="name-input" data-player="0">  
+        <input type="text" name="name" minlength="1" maxlength="10" required>
+        <button type="submit">Accept</button>
+      </form>
     </div>
-    <div id="player1"></div>
+    <div id="player1">
+      <div id="name-player-1">Player 2</div>
+      <form class="name-input" data-player="1">   
+        <input type="text" name="name" minlength="1" maxlength="10" required>
+        <button type="submit">Accept</button>
+      </form>
+    </div>
     <div id="gameboard">
       <div class="grid-cell border-right border-bottom" data-x="0" data-y="0" data-symbol="o">O</div>
       <div class="grid-cell border-right border-left border-bottom" data-x="0" data-y="1" data-symbol="x">X</div>

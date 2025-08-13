@@ -1,6 +1,22 @@
 // Array of a gameboard in a Gameboard object.
 // Gameboard array should be a variable within a module, so we can not directly influence it but with the functions
 
+const UI = (function () {
+  const forms = document.querySelectorAll('form');
+  forms.forEach(form => {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const playerForm = new FormData(form);
+      const playerName = playerForm.get("name");
+      if (playerName !== "") {
+        players.addPlayer(playerName);
+        document.querySelector(`#name-player-${form.dataset.player}`).textContent = playerName;
+        form.style.display = "none";
+      };
+    });
+  });
+})();
+
 const gameFlow = (function () {
   // Have a variable to see who's turn it is
   let currentPlayer;
@@ -158,4 +174,3 @@ const gameboard = (function () {
   }
   return { playCell, resetBoard };
 })();
-
