@@ -1,11 +1,41 @@
 // Array of a gameboard in a Gameboard object.
 // Gameboard array should be a variable within a module, so we can not directly influence it but with the functions
 
-const players = (function () {
-  function addPlayer(name) {
+const gameFlow = (function () {
+  let currentPlayer;
 
+  const whoGoesFirst = function (id) {
+    currentPlayer = id;
+  }
+  const startGame = function() {
+    if (players.playersReady) {
+      gameboard.resetBoard();
+    }
   }
 });
+
+const players = (function () {
+  const playersArray = [];
+
+  const addPlayer = function(name) {
+    const playerSymbol = playersArray.length === 0 ? "o" : "x";
+    return { name, playerSymbol };
+  }
+  
+  const getPlayer = function(id) {
+    return playersArray[id];
+  }
+
+  const resetPlayers = function() {
+    playersArray.splice(0, playersArray.length);
+  }
+
+  const playersReady = function() {
+    return playersArray.length === 2;
+  }
+
+  return { addPlayer, resetPlayers, playersReady };
+})();
 
 const gameboard = (function () {
   // Gameboard coordinates: 
@@ -64,11 +94,18 @@ const gameboard = (function () {
     return result;
   };
 
+  const resetBoard = function() {
+    boardArray = [
+      [null, null, null], [null, null, null], [null, null, null],
+    ];
+  }
+
   const playCell = function(x, y, player) {
     boardArray[x][y] = player.symbol;
     console.log(boardArray)
     checkProgress(x, y);
   }
-  return{ playCell };
+
+  return { playCell, resetBoard };
 })();
 
