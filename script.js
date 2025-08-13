@@ -1,5 +1,6 @@
 // The IIFE to alter the userInterface
 const userInterface = (function () {
+
   // Add userInterface Elements needed 
   const form = document.querySelector('form');
   const gridCells = document.querySelectorAll('.grid-cell');
@@ -35,12 +36,15 @@ const userInterface = (function () {
     };
     form.reset();
   });
+  // The buttons to decide who goes first
   [player0Button, player1Button].forEach(button => {
     button.addEventListener('click', () => {
       firstButtons.style.display = "none";
+      // Start the game with the player who is first
       gameFlow.setGame(button.dataset.player);
     });  
   });
+  // The cells in the tic tac toe grid
   gridCells.forEach(cell => {
     cell.addEventListener('click', () => {
       // If the game is running and the cell is empty
@@ -54,12 +58,14 @@ const userInterface = (function () {
       };
     });
   });
+  // The buttons to let the player decide to play again or not
   again.forEach(button => {
     button.addEventListener('click', () => {
       gameFlow.reset(button.dataset.again);
     });
   });
 
+  // At the end of the game, show the again buttons and update the score
   function endGame(player, newScore) {
     againButtons.style.display = "flex";
     document.querySelector(`#score-player-${player}`).textContent = newScore;
@@ -72,11 +78,13 @@ const userInterface = (function () {
 
   // Reset the board 
   function resetBoard(option) {
+    // Reset the game board UI
     gridCells.forEach(cell => {
       cell.removeAttribute("data-symbol");
       cell.textContent = "";
     });
     againButtons.style.display = "none";
+    // If the player does not want to play again, reset everything
     if (option === "no") {
       player0Score.textContent = 0;
       player1Score.textContent = 0;
@@ -90,21 +98,26 @@ const userInterface = (function () {
   return { updateHelp, endGame, resetBoard };
 })();
 
+// The IIFE that handles the flow of the game
 const gameFlow = (function () {
-  // Have a variable to see who's turn it is
+
+  // Have a variable to see who's turn it is and if the game has started or not
   let currentPlayer;
   let gameStart = false;
 
   // Handle the game end
   function endGame(result) {
+    // Set the game to end
     gameStart = false;
     const player = getCurrentPlayer();
+    // Add score if there is a winner, otherwise just display the message
     if (result === "draw") {
       userInterface.updateHelp('Draw! Play again?');
     } else {
       userInterface.updateHelp(`${result} wins! Play again?`);
       player.addScore();
     }
+    // Call the userInterface to initiate endgame cleanup
     userInterface.endGame(currentPlayer, player.score);
   }
 
@@ -114,14 +127,12 @@ const gameFlow = (function () {
     players.addPlayer(playerName1);
   }
 
-
   // Execute a single turn
   const executeTurn = function(x, y) {
     // Get the current player
     const player = players.getPlayer(currentPlayer);
     // Play the cell
     result = gameboard.playCell(x, y, player);
-    console.log(result)
     // If the result is not null, someone won or it's a draw
     if (result !== null) {  
       endGame(result);
@@ -144,13 +155,16 @@ const gameFlow = (function () {
     userInterface.updateHelp(`${getCurrentPlayer().name}'s turn`);
   }
 
+  // Return the current player
   function getCurrentPlayer() {
     return players.getPlayer(currentPlayer);
   }
 
+  // Reset the game, tell all other IIFE's to reset their states as well
   function reset(option) {
     userInterface.resetBoard(option);
     gameboard.resetBoard();
+    // If the player wants to play again, don't reset everything, switch players and start over
     if (option === "yes") {
       currentPlayer = currentPlayer === 0 ? 1 : 0;
       setGame(currentPlayer);
@@ -158,18 +172,20 @@ const gameFlow = (function () {
       players.resetPlayers();
     }
   }
-
   return { setGame, showProgress, executeTurn, getCurrentPlayer, register, reset };
 })();
 
+// The IIFE to handle creation and update of players
 const players = (function () {
   const playersArray = [];
 
+  // The player object
   function Player(name, symbol) {
     this.name = name;
     this.playerSymbol = symbol;
     this.score = 0;
   }
+  // Add a function so the players can add scores
   Player.prototype.addScore = function() {
     this.score++;
   };
@@ -202,6 +218,7 @@ const gameboard = (function () {
   //  -------+--------+-------
   //  [2][0] | [2][1] | [2][2]
 
+  // Initiate the game board array
   let boardArray = [
     [null, null, null], [null, null, null], [null, null, null],
   ];
@@ -250,6 +267,7 @@ const gameboard = (function () {
           return result;
         } 
       }
+      // If there have been 9 turns, then the board must be full
       if (turns === 9) {
         return "draw";
       }
@@ -257,6 +275,7 @@ const gameboard = (function () {
     return result;
   };
 
+  // Reset the board and turns
   const resetBoard = function() {
     boardArray = [
       [null, null, null], [null, null, null], [null, null, null],
@@ -264,11 +283,10 @@ const gameboard = (function () {
     turns = 0;
   }
 
+  // Play a single cell, set the players symbol on the cell
   const playCell = function(x, y, player) {
     boardArray[x][y] = player.playerSymbol;
-    console.log(boardArray)
     return checkProgress(x, y);
-
   }
   return { playCell, resetBoard };
 })();
