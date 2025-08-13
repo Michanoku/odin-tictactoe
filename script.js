@@ -2,29 +2,46 @@
 // Gameboard array should be a variable within a module, so we can not directly influence it but with the functions
 
 const gameboard = (function () {
+  // Gameboard coordinates: 
+  //  [0][0] | [0][1] | [0][2]
+  //  -------+--------+-------
+  //  [1][0] | [1][1] | [1][2]
+  //  -------+--------+-------
+  //  [2][0] | [2][1] | [2][2]
+
   let boardArray = [
     [null, null, null], [null, null, null], [null, null, null],
   ];
 
+  // This function checks if someone has won the game after this turn
   function checkProgress() {
+    // This function checks 3 coordinates (that form a line on the gameboard)
     function checkLine(coordA, coordB, coordC) {
+      // If the first coordinate is not null, and the three coordinates are otherwise the same, return the value (the players symbol)
       if (coordA !== null && (coordA === coordB && coordB === coordC)) {
         return coordA;
       } else {
         return null;
       }
     }
-    // Check for winning condition
-    // if [0][0] is equal to [1][1] and [2][2] or [0][2] is equal to [1][1] and [2][0]
-    // if [0][i] is equal to [1][i] and [2][i] or if [i][0] is equal to [i][1] and [i][2]
+
+    // Winning Condition: if [0][0] is equal to [1][1] and [2][2] or [0][2] is equal to [1][1] and [2][0]
+    // or if [0][i] is equal to [1][i] and [2][i] or if [i][0] is equal to [i][1] and [i][2]
+
+    // Prepare an array of coordinates that form the lines we need to check for the winning condition
     const lines = [[0, 0, 1, 1, 2, 2], [0, 2, 1, 1, 2, 0]];
     for (let i = 0; i < 3; i ++) {
       lines.push([0, i, 1, i, 2, i]);
       lines.push([i, 0, i, 1, i, 2]);
     }
+
     let result;
+    // Check all combination of lines to see if we have a winner (Could probably be reduced to only checking cells relevant to the one played)
     for (const line of lines) {
-      result = checkLine(boardArray[line[0]][line[1]], boardArray[line[2]][line[3]], boardArray[line[4]][line[5]]);
+      const cell1 = boardArray[line[0]][line[1]];
+      const cell2 = boardArray[line[2]][line[3]];
+      const cell3 = boardArray[line[4]][line[5]];
+      result = checkLine(cell1, cell2, cell3);
       if (result !== null) {
         console.log("WE HAVE A WINNER!")
         return result;
@@ -33,7 +50,7 @@ const gameboard = (function () {
   };
 
   const playCell = function(x, y, player) {
-    boardArray[x][y] = player.symbol;
+    boardArray[x][y] = player;
     console.log(boardArray)
     checkProgress();
   }
