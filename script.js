@@ -17,32 +17,40 @@ const userInterface = (function () {
         document.querySelector(`#name-player-${form.dataset.player}`).textContent = playerName;
         form.style.display = "none";
         document.querySelector(`#score-display-player-${form.dataset.player}`).style.display = "block";
+
+        // Tell gameflow that a new player was added
         gameFlow.registerAndCheck(playerName);
       };
     });
   });
   gridCells.forEach(cell => {
     cell.addEventListener('click', () => {
+      // If the game is running and the cell is empty
       if (gameFlow.showProgress() && !cell.dataset.symbol) {
+        // Get the playerss symbol and place it in the dataset as well as the UI
         let symbol = gameFlow.getCurrentPlayer().playerSymbol;
         cell.dataset.symbol = symbol;
         cell.textContent = symbol.toUpperCase();
+
+        // Tell gameflow that the cell was played
         gameFlow.executeTurn(cell.dataset.x, cell.dataset.y);
       };
     });
   });
 
+  // Update the help text in the UI
   function updateHelp(message) {
     help.textContent = message;
   }
 
+  // Reset the board 
   function resetBoard() {
     gridCells.forEach(cell => {
       cell.removeAttribute("data-symbol");
       cell.textContent = "";
     });
   }
-  return { updateHelp };
+  return { updateHelp, resetBoard };
 })();
 
 const gameFlow = (function () {
@@ -54,6 +62,7 @@ const gameFlow = (function () {
     currentPlayer = id;
   }
 
+  // Handle the game end
   function endGame(result) {
     gameStart = false;
     if (result === "draw") {
@@ -63,6 +72,7 @@ const gameFlow = (function () {
     }
   }
 
+  // Get the players names and hand them to the players IIFE, start the game if there are 2 players
   function registerAndCheck() {
     count = players.addPlayer(playerName);
     if (count === 2) {
@@ -70,34 +80,33 @@ const gameFlow = (function () {
     }
   }
 
+  // Execute a single turn
   const executeTurn = function(x, y) {
+    // Get the current player
     const player = players.getPlayer(currentPlayer);
-    result = null;
+    // Play the cell
     result = gameboard.playCell(x, y, player);
-    console.log(result)
+    // If the result is not null, someone won or it's a draw
     if (result !== null) {  
       endGame(result);
+    // Else, update the interface with who's turn it is and switch players
     } else {
       userInterface.updateHelp(`${gameFlow.getCurrentPlayer().name}'s turn`);
       currentPlayer = currentPlayer === 0 ? 1 : 0;
     }
   }
 
+  // Show whether the game is running or not
   const showProgress = function () {
     return gameStart;
   };
 
   // Set the initial game state
   function setGame() {
-    console.log("Checking that players are ready")
-    console.log("Player 0 goes first.")
     whoGoesFirst(0);
-    console.log("Reset the board.")
-    gameboard.resetBoard();
     gameStart = true;
     userInterface.updateHelp(`${getCurrentPlayer().name}'s turn`);
   }
-
 
   function getCurrentPlayer() {
     return players.getPlayer(currentPlayer);
@@ -126,7 +135,7 @@ const players = (function () {
     playersArray.splice(0, playersArray.length);
   }
 
-  return { addPlayer, resetPlayers, playersReady, getPlayer };
+  return { addPlayer, resetPlayers, getPlayer };
 })();
 
 const gameboard = (function () {
