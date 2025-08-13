@@ -27,10 +27,13 @@ const userInterface = (function () {
       player0NameDiv.textContent = playerName0;
       player1NameDiv.textContent = playerName1;
       form.style.display = "none";
-      updateHelp('Who goes first?');
       player0Button.textContent = playerName0;
       player1Button.textContent = playerName1;
       firstButtons.style.display = "flex";
+
+      // Update the game help text
+      updateHelp('Who goes first?');
+
       // Tell gameflow that the players were added
       gameFlow.register(playerName0, playerName1);
     };
@@ -40,7 +43,8 @@ const userInterface = (function () {
   [player0Button, player1Button].forEach(button => {
     button.addEventListener('click', () => {
       firstButtons.style.display = "none";
-      // Start the game with the player who is first
+
+      // Tell gameFlow to Start the game with the player who is first
       gameFlow.setGame(button.dataset.player);
     });  
   });
@@ -49,10 +53,11 @@ const userInterface = (function () {
     cell.addEventListener('click', () => {
       // If the game is running and the cell is empty
       if (gameFlow.showProgress() && !cell.dataset.symbol) {
-        // Get the playerss symbol and place it in the dataset as well as the UI
+        // Get the players symbol and place it in the dataset as well as the UI
         let symbol = gameFlow.getCurrentPlayer().playerSymbol;
         cell.dataset.symbol = symbol;
         cell.textContent = symbol.toUpperCase();
+
         // Tell gameflow that the cell was played
         gameFlow.executeTurn(parseInt(cell.dataset.x), parseInt(cell.dataset.y));
       };
@@ -61,6 +66,7 @@ const userInterface = (function () {
   // The buttons to let the player decide to play again or not
   again.forEach(button => {
     button.addEventListener('click', () => {
+      // Tell gameflow to reset with the players decision
       gameFlow.reset(button.dataset.again);
     });
   });
@@ -90,9 +96,10 @@ const userInterface = (function () {
       player1Score.textContent = 0;
       player0NameDiv.textContent = 'Player 1';
       player1NameDiv.textContent = 'Player 2';
-      updateHelp('Enter player names');
       form.style.display = 'flex';
 
+      // Update the help text
+      updateHelp('Enter player names');
     }
   }
   return { updateHelp, endGame, resetBoard };
@@ -110,18 +117,20 @@ const gameFlow = (function () {
     // Set the game to end
     gameStart = false;
     const player = getCurrentPlayer();
-    // Add score if there is a winner, otherwise just display the message
+    // Add score if there is a winner, otherwise just display the draw message
     if (result === "draw") {
       userInterface.updateHelp('Draw! Play again?');
     } else {
       userInterface.updateHelp(`${result} wins! Play again?`);
+
+      // Add one score the the player
       player.addScore();
     }
     // Call the userInterface to initiate endgame cleanup
     userInterface.endGame(currentPlayer, player.score);
   }
 
-  // Get the players names and hand them to the players IIFE, start the game if there are 2 players
+  // Get the players names and hand them to the players IIFE
   function register(playerName0, playerName1) {
     players.addPlayer(playerName0);
     players.addPlayer(playerName1);
@@ -133,10 +142,10 @@ const gameFlow = (function () {
     const player = players.getPlayer(currentPlayer);
     // Play the cell
     result = gameboard.playCell(x, y, player);
-    // If the result is not null, someone won or it's a draw
+    // If the result is not null, call endgame to handle the result
     if (result !== null) {  
       endGame(result);
-    // Else, update the interface with who's turn it is and switch players
+    // Else, switch players and update the interface with who's turn it is
     } else {
       currentPlayer = currentPlayer === 0 ? 1 : 0;
       userInterface.updateHelp(`${gameFlow.getCurrentPlayer().name}'s turn`);
@@ -168,6 +177,7 @@ const gameFlow = (function () {
     if (option === "yes") {
       currentPlayer = currentPlayer === 0 ? 1 : 0;
       setGame(currentPlayer);
+    // Else tell players to reset the players too
     } else {
       players.resetPlayers();
     }
@@ -181,6 +191,9 @@ const players = (function () {
 
   // The player object
   function Player(name, symbol) {
+    if (!new.target) {
+      throw Error("You must use the 'new' operator to call the constructor.");
+    }
     this.name = name;
     this.playerSymbol = symbol;
     this.score = 0;
@@ -218,46 +231,53 @@ const gameboard = (function () {
   //  -------+--------+-------
   //  [2][0] | [2][1] | [2][2]
 
-  // Initiate the game board array
+  // Initiate the game board array and turns
   let boardArray = [
     [null, null, null], [null, null, null], [null, null, null],
   ];
   let turns = 0;
+
   // This function checks if someone has won the game after this turn
   function checkProgress(x, y) {
     // This function checks 3 coordinates (that form a line on the gameboard)
     function checkLine(coordA, coordB, coordC) {
-      // If the first coordinate is not null, and the three coordinates are otherwise the same, return the value (the players symbol)
+      // If the first coordinate is not null, and the three coordinates are otherwise the same, return the player name (they have won)
       if (coordA !== null && (coordA === coordB && coordB === coordC)) {
         return gameFlow.getCurrentPlayer().name;
       } else {
         return null;
       }
     }
+
     // Winning Condition: if [0][0] is equal to [1][1] and [2][2] or [0][2] is equal to [1][1] and [2][0]
     // or if [0][i] is equal to [1][i] and [2][i] or if [i][0] is equal to [i][1] and [i][2]
 
+    // Set result to null initially, if it stays null till the end, no one has won
     let result = null;
-
+  
+    // Increase the number of turns (If this was the first turn, after this action the turns will be 1)
     turns++;
     // A player can only win from turn 5 and onwards, so avoid checking before
     if (turns >= 5) {
       // Prepare an array of coordinates that form the lines we need to check for the winning condition
       // First, only add lines in the x or y position that is relevant
       const lines = [[x, 0, x, 1, x, 2], [0, y, 1, y, 2, y]];
+      // Prepare diagonal coordinates 
+      const diagonalY0 = [0, 0, 1, 1, 2, 2];
+      const diagonalY2 = [0, 2, 1, 1, 2, 0];
       // If the player played the central field, add both diagonals
       if (x === 1 && y === 1) {
-        lines.push([0, 0, 1, 1, 2, 2]);
-        lines.push([2, 0, 1, 1, 0, 2]);
+        lines.push(diagonalY0);
+        lines.push(diagonalY2);
       // If the player played the top left or bottom right corner, add that diagonal only
       } else if ((x === 0 || x === 2) && x === y ) {
-        lines.push([0, 0, 1, 1, 2, 2]);
+        lines.push(diagonalY0);
       // If the player played the top right or bottom left corner, add that diagonal only
       } else if ((x === 0 && y === 2) || (x === 2 && y === 0)) {
-        lines.push([0, 2, 1, 1, 2, 0]);
+        lines.push(diagonalY2);
       }
 
-      // Check all possible combination of lines to see if we have a winner (Could probably be reduced to only checking cells relevant to the one played)
+      // Check all possible combination of lines to see if we have a winner
       for (const line of lines) {
         const cell1 = boardArray[line[0]][line[1]];
         const cell2 = boardArray[line[2]][line[3]];
@@ -272,6 +292,7 @@ const gameboard = (function () {
         return "draw";
       }
     } 
+    // If nothing has happened, return the result (which will be null)
     return result;
   };
 
