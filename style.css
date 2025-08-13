@@ -24,6 +24,7 @@
   --background-color: #ECE5F0;
   --round-symbol: #59114D;
   --cross-symbol: #E98A15;
+  --border: 2px solid var(--grid-lines);
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -68,4 +69,39 @@ input {
 #gameboard {
   background-color: var(--background-color);
   grid-area: gameboard;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  place-content: center;
+  place-items: stretch;
+}
+
+.grid-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#title {
+  text-align: center;
+  font-family: "title", Arial, Helvetica, sans-serif;
+  color: var(--background-color);
+  font-size: 5.5rem;
+}
+
+.border-top {
+  border-top: var(--border);
+}
+
+.border-left {
+  border-left: var(--border);
+}
+
+.border-right {
+  border-right: var(--border);
+}
+
+.border-bottom {
+  border-bottom: var(--border);
 }
