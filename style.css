@@ -23,6 +23,7 @@
   --grid-lines: #003B36;
   --background-color: #ECE5F0;
   --background-color-muted: #D9CBE1;
+  --side-color: #675E51;
   --round-symbol: #2B50AA;
   --cross-symbol: #764248;
   --border: 2px solid var(--grid-lines);
@@ -45,13 +46,11 @@ input {
 #container {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 4fr 2fr;
-  grid-template-rows: 1fr 2fr 1fr 1fr;
+  grid-template-columns: 5fr 2fr;
+  grid-template-rows: 5rem 1fr;
   grid-template-areas: 
-    'top-bar top-bar'
-    'gameboard help-section'
-    'gameboard player0'
-    'gameboard player1';
+    'top-bar buffer'
+    'game-section help-section';
 }
 
 #top-bar {
@@ -61,9 +60,32 @@ input {
   align-items: center;
 }
 
-#help-section {
+#title {
+  flex: 1;
+  text-align: center;
+  font-family: "title", Arial, Helvetica, sans-serif;
+  color: var(--background-color);
+  font-size: 4rem;
+  padding-left: 2rem;
+}
+
+#buffer {
+  grid-area: buffer;
   background-color: var(--main-color);
-  grid-area: help-section;
+}
+
+#game-section {
+  display: grid;
+  background-color: var(--background-color);
+  grid-area: game-section;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr 7fr 2rem;
+  grid-template-areas: 
+    'player0 . player1'
+    'gameboard gameboard gameboard'
+    'attribution attribution attribution';
+  -webkit-box-shadow: inset 0px 5px 5px 2px #7A7A7A; 
+  box-shadow: inset 0px 5px 5px 2px #7A7A7A;  
 }
 
 #player0 {
@@ -76,10 +98,97 @@ input {
   grid-area: player1;
 }
 
+#player0, #player1 {
+  font-size: 2rem;
+  text-align: center;
+  color: var(--background-color);
+  align-content: center;
+}
+
+#attribution {
+  grid-area: attribution;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--grid-lines);
+} 
+
+#gameboard {
+  background-color: var(--background-color);
+  grid-area: gameboard;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  place-content: center;
+  place-items: stretch;
+}
+
+.grid-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 8rem;
+  cursor: pointer;
+}
+
+[data-symbol="x"] {
+  color: var(--cross-symbol);
+}
+
+[data-symbol="o"] {
+  color: var(--round-symbol);
+}
+
+.border-top {
+  border-top: var(--border);
+}
+
+.border-left {
+  border-left: var(--border);
+}
+
+.border-right {
+  border-right: var(--border);
+}
+
+.border-bottom {
+  border-bottom: var(--border);
+}
+
+#help-section {
+  background-color: var(--side-color);
+  grid-area: help-section;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#help {
+  text-align: center;
+  color: var(--background-color);
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
 .name-input {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+input[type="text"] {
+  font-size: 1rem;
+  border: 0;
+  border-radius: 25px;
+  padding: 5px 10px;
+  background-color: var(--background-color);
+  margin-bottom: 1rem;
+}
+
+input[type="text"]:focus {
+  border: 0;
+  -webkit-box-shadow: inset 5px 4px 5px 0px #C1C1C1; 
+  box-shadow: inset 5px 4px 5px 0px #C1C1C1;
 }
 
 button {
@@ -105,92 +214,4 @@ button:active {
 #again-buttons {
   display: none;
   justify-content: center;
-}
-
-#name-player-0, #name-player-1, 
-#score-display-player-0, #score-display-player-1 {
-  font-size: 2rem;
-  text-align: center;
-  color: var(--background-color);
-}
-
-#name-player-0, #name-player-1 {
-  margin: 1rem 0rem;
-}
-
-input[type="text"] {
-  font-size: 1rem;
-  border: 0;
-  border-radius: 25px;
-  padding: 5px 10px;
-  background-color: var(--background-color);
-  margin-bottom: 1rem;
-}
-
-input[type="text"]:focus {
-  border: 0;
-  -webkit-box-shadow: inset 5px 4px 5px 0px #C1C1C1; 
-  box-shadow: inset 5px 4px 5px 0px #C1C1C1;
-}
-
-#gameboard {
-  background-color: var(--background-color);
-  grid-area: gameboard;
-  padding: 2rem;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  place-content: center;
-  place-items: stretch;
-  -webkit-box-shadow: inset 0px 5px 5px 2px #7A7A7A; 
-  box-shadow: inset 0px 5px 5px 2px #7A7A7A;  
-}
-
-.grid-cell {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 8rem;
-  cursor: pointer;
-}
-
-[data-symbol="x"] {
-  color: var(--cross-symbol);
-}
-
-[data-symbol="o"] {
-  color: var(--round-symbol);
-}
-
-#title {
-  flex: 1;
-  text-align: center;
-  font-family: "title", Arial, Helvetica, sans-serif;
-  color: var(--background-color);
-  font-size: 5.5rem;
-  padding-left: 2rem;
-}
-
-#help {
-  flex: 1;
-  text-align: center;
-  color: var(--background-color);
-  font-size: 2rem;
-  margin-bottom: 2rem;
-}
-
-.border-top {
-  border-top: var(--border);
-}
-
-.border-left {
-  border-left: var(--border);
-}
-
-.border-right {
-  border-right: var(--border);
-}
-
-.border-bottom {
-  border-bottom: var(--border);
 }

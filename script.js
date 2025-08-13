@@ -4,6 +4,10 @@ const userInterface = (function () {
   const form = document.querySelector('form');
   const gridCells = document.querySelectorAll('.grid-cell');
   const help = document.querySelector('#help');
+  const player0NameDiv = document.querySelector('#name-player-0');
+  const player1NameDiv = document.querySelector('#name-player-1');
+  const player0Score = document.querySelector('#score-player-0');
+  const player1Score = document.querySelector('#score-player-1');
   const firstButtons = document.querySelector('#first-buttons');
   const player0Button = document.querySelector('#button-player-0');
   const player1Button = document.querySelector('#button-player-1');
@@ -19,8 +23,8 @@ const userInterface = (function () {
     const playerName1 = playerForm.get("name-player-1");
     if (playerName0 && playerName1) {
       // Update the player section with their name, hide the input and show the scoreboard
-      document.querySelector('#name-player-0').textContent = playerName0;
-      document.querySelector('#name-player-1').textContent = playerName1;
+      player0NameDiv.textContent = playerName0;
+      player1NameDiv.textContent = playerName1;
       form.style.display = "none";
       updateHelp('Who goes first?');
       player0Button.textContent = playerName0;
@@ -29,6 +33,7 @@ const userInterface = (function () {
       // Tell gameflow that the players were added
       gameFlow.register(playerName0, playerName1);
     };
+    form.reset();
   });
   [player0Button, player1Button].forEach(button => {
     button.addEventListener('click', () => {
@@ -45,7 +50,7 @@ const userInterface = (function () {
         cell.dataset.symbol = symbol;
         cell.textContent = symbol.toUpperCase();
         // Tell gameflow that the cell was played
-        gameFlow.executeTurn(cell.dataset.x, cell.dataset.y);
+        gameFlow.executeTurn(parseInt(cell.dataset.x), parseInt(cell.dataset.y));
       };
     });
   });
@@ -55,9 +60,9 @@ const userInterface = (function () {
     });
   });
 
-  function endGame(newScore) {
+  function endGame(player, newScore) {
     againButtons.style.display = "flex";
-    updateHelp("Play again?");
+    document.querySelector(`#score-player-${player}`).textContent = newScore;
   }
 
   // Update the help text in the UI
@@ -66,12 +71,21 @@ const userInterface = (function () {
   }
 
   // Reset the board 
-  function resetBoard() {
+  function resetBoard(option) {
     gridCells.forEach(cell => {
       cell.removeAttribute("data-symbol");
       cell.textContent = "";
-      againButtons.style.display = "none";
     });
+    againButtons.style.display = "none";
+    if (option === "no") {
+      player0Score.textContent = 0;
+      player1Score.textContent = 0;
+      player0NameDiv.textContent = 'Player 1';
+      player1NameDiv.textContent = 'Player 2';
+      updateHelp('Enter player names');
+      form.style.display = 'flex';
+
+    }
   }
   return { updateHelp, endGame, resetBoard };
 })();
@@ -86,10 +100,10 @@ const gameFlow = (function () {
     gameStart = false;
     const player = getCurrentPlayer();
     if (result === "draw") {
-      userInterface.updateHelp('Draw!');
+      userInterface.updateHelp('Draw! Play again?');
     } else {
-      userInterface.updateHelp(`${result} wins!`);
-      player.addPoint();
+      userInterface.updateHelp(`${result} wins! Play again?`);
+      player.addScore();
     }
     userInterface.endGame(currentPlayer, player.score);
   }
@@ -135,13 +149,13 @@ const gameFlow = (function () {
   }
 
   function reset(option) {
-    userInterface.resetBoard();
+    userInterface.resetBoard(option);
     gameboard.resetBoard();
     if (option === "yes") {
       currentPlayer = currentPlayer === 0 ? 1 : 0;
       setGame(currentPlayer);
     } else {
-      players.resetPlayers;
+      players.resetPlayers();
     }
   }
 

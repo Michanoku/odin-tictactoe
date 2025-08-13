@@ -11,6 +11,27 @@
     <div id="top-bar">
       <div id="title">Tic-Tac-Toe</div>
     </div>
+    <div id="buffer"></div>
+    <div id="game-section">
+      <div id="player0">
+        <span id="name-player-0">Player 1</span>: <span id="score-player-0">0</span>
+      </div>
+      <div id="player1">
+        <span id="name-player-1">Player 2</span>: <span id="score-player-1">0</span>
+      </div>
+      <div id="gameboard">
+        <div class="grid-cell border-right border-bottom" data-x="0" data-y="0"></div>
+        <div class="grid-cell border-right border-left border-bottom" data-x="0" data-y="1"></div>
+        <div class="grid-cell border-left border-bottom" data-x="0" data-y="2"></div>
+        <div class="grid-cell border-right border-bottom border-top" data-x="1" data-y="0"></div>
+        <div class="grid-cell border-right border-left border-bottom border-top" data-x="1" data-y="1"></div>
+        <div class="grid-cell border-left border-bottom border-top" data-x="1" data-y="2"></div>
+        <div class="grid-cell border-right border-top" data-x="2" data-y="0"></div>
+        <div class="grid-cell border-right border-left border-top" data-x="2" data-y="1"></div>
+        <div class="grid-cell border-left border-top" data-x="2" data-y="2"></div>
+      </div>
+      <div id="attribution">Font: 3Dumb and 2Dumb by Michael Tension via Font Squirrel. (https://www.fontsquirrel.com/fonts/3dumb)</div>
+    </div>
     <div id="help-section">
       <div id="help">Enter player names</div>
       <form class="name-input">  
@@ -26,25 +47,6 @@
         <button name="again" data-again="yes" type="button">Yes</button>
         <button name="again" data-again="no" type="button">No</button>
       </div>
-    </div>
-    <div id="player0">
-      <div id="name-player-0">Player 1</div>
-      <div id="score-display-player-0">Score: <span id="score-player-0">0</span></div>
-    </div>
-    <div id="player1">
-      <div id="name-player-1">Player 2</div>
-      <div id="score-display-player-1">Score: <span id="score-player-1">0</span></div>
-    </div>
-    <div id="gameboard">
-      <div class="grid-cell border-right border-bottom" data-x="0" data-y="0"></div>
-      <div class="grid-cell border-right border-left border-bottom" data-x="0" data-y="1"></div>
-      <div class="grid-cell border-left border-bottom" data-x="0" data-y="2"></div>
-      <div class="grid-cell border-right border-bottom border-top" data-x="1" data-y="0"></div>
-      <div class="grid-cell border-right border-left border-bottom border-top" data-x="1" data-y="1"></div>
-      <div class="grid-cell border-left border-bottom border-top" data-x="1" data-y="2"></div>
-      <div class="grid-cell border-right border-top" data-x="2" data-y="0"></div>
-      <div class="grid-cell border-right border-left border-top" data-x="2" data-y="1"></div>
-      <div class="grid-cell border-left border-top" data-x="2" data-y="2"></div>
     </div>
   </div>
   <script src="script.js"></script>
