@@ -40,7 +40,12 @@ A browser-based Tic-Tac-Toe game built with JavaScript, HTML, and CSS as part of
 ├── index.html
 ├── README.md
 ├── script.js
-└── style.css
+├── style.css
+└── fonts
+    ├── 2Dumb.woff
+    ├── 2Dumb.woff2
+    ├── 3Dumb.woff
+    └── 3Dumb.woff2
 ```
 
 ---
